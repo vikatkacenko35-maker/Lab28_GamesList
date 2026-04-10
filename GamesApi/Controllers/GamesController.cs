@@ -11,6 +11,23 @@ public class GamesController : ControllerBase
     [HttpGet]
     public ActionResult<List<Game>> GetAll()
     {
+        
+        return Ok(GameStore.Games);
+    }
+    // [HttpGet("{isFavourite}")]
+    // public ActionResult<Game> GetBy(bool isFavourite)
+    // {
+    //     var game = GameStore.Games.FirstOrDefault(g => g.IsFavourite == isFavourite);
+    //     if (isFavourite == false)
+    //     {
+    //         return NotFound(new { message = $"Игра еще не оцененa" });
+
+    //     }
+    //     return Ok(isFavourite);
+    }
+    [HttpGet]
+    public ActionResult<List<Game>> GetAll()
+    {
         return Ok(GameStore.Games);
     }
     [HttpGet("{id}")]
@@ -27,21 +44,15 @@ public class GamesController : ControllerBase
     [HttpPost]
     public ActionResult<Game> Create([FromBody] Game game)
     {
+        if(game.Title is null)
+        {
+            return BadRequest(new {message = $"Название игры не может быть пустым"});
+        }
         game.Id = GameStore.NextId();
         GameStore.Games.Add(game);
         return CreatedAtAction(nameof(GetById), new { id = game.Id }, game);
     }
-    [HttpGet("{isFavourite}")]
-    public ActionResult<Game> GetBy(bool isFavourite)
-    {
-        var game = GameStore.Games.FirstOrDefault(g => g.IsFavourite == isFavourite);
-        if (isFavourite == false)
-        {
-            return NotFound(new { message = $"Игра еще не оцененa" });
 
-        }
-        return Ok(isFavourite);
-    }
 
     [HttpDelete("{id}")]
     public ActionResult Delete(int id)
@@ -67,5 +78,4 @@ public class GamesController : ControllerBase
         game.ReleaseYear = updated.ReleaseYear;
         return Ok(game);
     }
-
 }
